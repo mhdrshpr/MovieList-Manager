@@ -1,0 +1,88 @@
+# .htaccess
+# تنظیمات امنیتی و سشن
+
+# فعال کردن Rewrite Engine
+RewriteEngine On
+
+# تنظیمات سشن - یکسان برای کل سایت
+php_value session.name "MOVIE_SESSION"
+php_value session.cookie_path "/"
+php_value session.cookie_httponly "1"
+php_value session.use_only_cookies "1"
+php_value session.cookie_samesite "Lax"
+php_value session.gc_maxlifetime "86400"
+
+# تنظیمات charset
+AddDefaultCharset UTF-8
+php_value default_charset "UTF-8"
+
+# جلوگیری از نمایش خطاها به کاربر (فعال در محیط تولید)
+# php_flag display_errors Off
+
+# Redirect to HTTPS (در صورت داشتن SSL - فعال کن)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# جلوگیری از دسترسی مستقیم به فایل‌های حساس
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# محافظت صریح از فایل‌های .env و لاگ و اسکیمای دیتابیس
+<FilesMatch "\.(env|env\.example|ini|log|sql|bak|sqlite|lock|git)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "(composer\.json|composer\.lock|package\.json|package-lock\.json|webpack\.config\.js|vite\.config\.js|api/env_loader\.php|api/db_connect\.php)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# جلوگیری از لیست شدن محتویات پوشه
+Options -Indexes
+
+# جلوگیری از اجرای اسکریپت در پوشه آپلود
+<FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|cgi|asp|jsp)$">
+    # این بخش را فقط در صورت نیاز برای پوشه‌های آپلود فعال کنید
+    # RemoveHandler .php .phtml .php3 .php4 .php5
+</FilesMatch>
+
+# هدرهای امنیتی
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    # جلوگیری از ذخیره فایل‌های حساس در حافظه مرورگر
+    Header always set Cache-Control "no-store, no-cache, must-revalidate"
+</IfModule>
+
+# غیرفعال کردن نمایش خطاهای PHP در محیط تولید
+php_flag display_errors Off
+php_flag log_errors On
+php_flag display_startup_errors Off
+
+# تنظیمات کش برای فایل‌های استاتیک
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# فشرده سازی فایل‌ها
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# فشرده سازی فایل‌ها
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>

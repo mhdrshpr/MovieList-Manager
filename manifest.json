@@ -1,0 +1,84 @@
+{
+  "id": "/",
+  "name": "MovieManager - مدیریت فیلم و سریال",
+  "short_name": "MovieMgr",
+  "description": "مدیریت هوشمند فیلم و سریال‌های شخصی با دستاورد، آمار و اشتراک‌گذاری",
+  "start_url": "/dash.php",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0b1120",
+  "theme_color": "#0891b2",
+  "lang": "fa-IR",
+  "dir": "rtl",
+  "categories": ["entertainment", "productivity", "utilities", "lifestyle"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "داشبورد",
+      "short_name": "داشبورد",
+      "description": "مشاهده لیست‌های من",
+      "url": "/dash.php",
+      "icons": [
+        {
+          "src": "/static/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "همه عناوین",
+      "short_name": "عناوین",
+      "description": "جستجو در همه فیلم‌ها و سریال‌ها",
+      "url": "/all_titles.php",
+      "icons": [
+        {
+          "src": "/static/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "پروفایل من",
+      "short_name": "پروفایل",
+      "description": "مشاهده پروفایل و دستاوردها",
+      "url": "/user.php",
+      "icons": [
+        {
+          "src": "/static/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

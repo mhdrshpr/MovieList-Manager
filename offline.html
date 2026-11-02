@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>حالت آفلاین | سامانه مدیریت فیلم و سریال</title>
+
+    <!-- PWA & Theme -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0891b2">
+    <meta name="application-name" content="MovieManager">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MovieManager">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'IRANSansX';
+            src: url('static/fonts/IRANSansX-Thin.woff2') format('woff2');
+            font-weight: 300;
+        }
+        @font-face {
+            font-family: 'IRANSansX';
+            src: url('static/fonts/IRANSansX-Regular.woff2') format('woff2');
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: 'IRANSansX';
+            src: url('static/fonts/IRANSansX-Bold.woff2') format('woff2');
+            font-weight: 700;
+        }
+
+        /* ==================== LUCIDE ICON HELPERS ==================== */
+        [data-lucide] {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        :root {
+            --background: #f8fafc;
+            --foreground: #0f172a;
+            --card: #ffffff;
+            --card-glass: rgba(255, 255, 255, 0.85);
+            --primary: #0891b2;
+            --primary-light: #06b6d4;
+            --primary-glow: rgba(8, 145, 178, 0.3);
+            --secondary: #f1f5f9;
+            --muted-foreground: #64748b;
+            --border: #e2e8f0;
+            --accent: #ecfeff;
+            --destructive: #ef4444;
+            --success: #10b981;
+            --radius-xl: 24px;
+        }
+
+        .dark {
+            --background: #0b1120;
+            --foreground: #f1f5f9;
+            --card: #111827;
+            --card-glass: rgba(17, 24, 39, 0.85);
+            --primary: #22d3ee;
+            --primary-light: #67e8f9;
+            --primary-glow: rgba(34, 211, 238, 0.25);
+            --secondary: #1e293b;
+            --muted-foreground: #94a3b8;
+            --border: #1e293b;
+            --accent: #0c2d3b;
+            --destructive: #f87171;
+            --success: #34d399;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'IRANSansX', system-ui, -apple-system, Tahoma, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--foreground);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* پس‌زمینه پویا */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(80px);
+            opacity: 0.18;
+            z-index: 0;
+            transition: all 0.5s ease;
+        }
+        .glow-1 {
+            width: 450px;
+            height: 450px;
+            background: #0891b2;
+            top: -150px;
+            right: -150px;
+        }
+        .glow-2 {
+            width: 400px;
+            height: 400px;
+            background: #6366f1;
+            bottom: -150px;
+            left: -150px;
+        }
+
+        /* دکمه‌های کنترل هدر */
+        .header-controls {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            right: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 14px;
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--foreground);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .btn-icon:hover {
+            transform: scale(1.06);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* کارت اصلی آفلاین */
+        .offline-container {
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .offline-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2.25rem 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
+            animation: cardSlideUp 0.4s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes cardSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* آیکون آفلاین و انیمیشن پالس */
+        .icon-container {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .icon-core {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 12px 28px var(--primary-glow);
+            position: relative;
+            z-index: 2;
+            animation: floatIcon 3.5s ease-in-out infinite;
+        }
+
+        .icon-core [data-lucide] {
+            width: 44px;
+            height: 44px;
+            stroke-width: 1.9;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+        }
+
+        .icon-pulse-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 30px;
+            background: var(--primary);
+            opacity: 0;
+            z-index: 1;
+            animation: pulseWave 2.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+        }
+        @keyframes pulseWave {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(1.45); opacity: 0; }
+        }
+
+        /* تیتر و توضیحات */
+        .title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--foreground);
+            margin-bottom: 0.6rem;
+        }
+
+        .subtitle {
+            font-size: 0.88rem;
+            color: var(--muted-foreground);
+            line-height: 1.7;
+            margin-bottom: 1.4rem;
+        }
+
+        /* وضعیت اتصال آنلاین/آفلاین */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .status-pill.offline {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--destructive);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        .status-pill.online {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: dotBlink 1.4s ease-in-out infinite;
+        }
+        @keyframes dotBlink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+        }
+
+        /* دکمه‌ها */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #ffffff;
+            box-shadow: 0 6px 18px var(--primary-glow);
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .btn-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--foreground);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: var(--secondary);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* لودینگ */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* شبکه دسترسی سریع صفحات کش شده */
+        .quick-nav {
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
+            text-align: right;
+        }
+        .quick-nav-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted-foreground);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .quick-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+        }
+        .quick-link-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: var(--foreground);
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .quick-link-item:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* پیام اعلان توست */
+        .toast-msg {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: var(--card);
+            color: var(--foreground);
+            border: 1px solid var(--border);
+            padding: 0.65rem 1.2rem;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- افکت‌های نور پس‌زمینه -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <!-- هدر کنترل تم و برند -->
+    <header class="header-controls">
+        <div class="brand-badge">
+            <i data-lucide="film"></i>
+            <span>MovieManager</span>
+        </div>
+        <button id="themeToggle" class="btn-icon" title="تغییر حالت تم">
+            <i data-lucide="moon"></i>
+        </button>
+    </header>
+
+    <!-- کانتینر اصلی -->
+    <main class="offline-container">
+        <div class="offline-card">
+            <!-- آیکون شناور -->
+            <div class="icon-container">
+                <div class="icon-pulse-ring"></div>
+                <div class="icon-core">
+                    <i data-lucide="wifi-off"></i>
+                </div>
+            </div>
+
+            <h1 class="title">ارتباط اینترنتی برقرار نیست</h1>
+            <p class="subtitle">
+                دسترسی شما به شبکه اینترنت موقتاً قطع شده است. صفحات و داده‌های قبلی در حافظه کش دستگاه محفوظ می‌باشند.
+            </p>
+
+            <!-- برچسب وضعیت زنده -->
+            <div class="status-pill offline" id="statusPill">
+                <span class="status-dot"></span>
+                <span id="statusLabel">وضعیت: آفلاین</span>
+            </div>
+
+            <!-- دکمه‌های اقدام -->
+            <div class="action-buttons">
+                <button type="button" id="retryConnectionBtn" class="btn btn-primary">
+                    <i data-lucide="refresh-cw"></i>
+                    <span id="retryBtnText">تلاش مجدد و بررسی اتصال</span>
+                </button>
+                <a href="dash.php" class="btn btn-outline" id="goToDashboardLink">
+                    <i data-lucide="layout-grid"></i>
+                    <span>داشبورد (نسخه کش شده)</span>
+                </a>
+            </div>
+
+            <!-- ناوبری سریع به بخش‌های ذخیره‌شده -->
+            <div class="quick-nav">
+                <div class="quick-nav-title">
+                    <i data-lucide="bookmark"></i>
+                    <span>دسترسی به بخش‌های آفلاین:</span>
+                </div>
+                <div class="quick-nav-grid">
+                    <a href="all_titles.php" class="quick-link-item">
+                        <i data-lucide="list"></i>
+                        <span>همه عناوین</span>
+                    </a>
+                    <a href="user.php" class="quick-link-item">
+                        <i data-lucide="award"></i>
+                        <span>دستاوردها</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- اعلان پیام وضعیت -->
+    <div id="toastMessage" class="toast-msg">
+        <i data-lucide="info"></i>
+        <span id="toastText">پیام</span>
+    </div>
+
+    <script>
+        function refreshIcons() {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                try {
+                    window.lucide.createIcons();
+                } catch (e) {
+                    console.warn('Lucide icon render error:', e);
+                }
+            }
+        }
+
+        // تم تاریک / روشن منطبق با داشبورد اصلی
+        const themeToggle = document.getElementById('themeToggle');
+        function applySavedTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                themeToggle.innerHTML = '<i data-lucide="sun"></i>';
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggle.innerHTML = '<i data-lucide="moon"></i>';
+            }
+            refreshIcons();
+        }
+        applySavedTheme();
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
+            refreshIcons();
+        });
+
+        // نمایش اعلان سریع توست
+        function showNotification(text, iconName = 'info') {
+            const toast = document.getElementById('toastMessage');
+            const toastText = document.getElementById('toastText');
+            toastText.textContent = text;
+            toast.querySelector('[data-lucide]')?.setAttribute('data-lucide', iconName);
+            refreshIcons();
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // بررسی اتصال واقعی شبکه با پینگ هدر
+        async function testNetworkConnection() {
+            if (!navigator.onLine) return false;
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                const res = await fetch('favicon.ico?_ping=' + Date.now(), {
+                    method: 'HEAD',
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                return res.ok;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        // بررسی وضعیت آنلاین / آفلاین
+        const statusPill = document.getElementById('statusPill');
+        const statusLabel = document.getElementById('statusLabel');
+
+        async function updateNetworkStatus() {
+            const isOnline = navigator.onLine;
+            if (isOnline) {
+                statusPill.className = 'status-pill online';
+                statusLabel.textContent = 'وضعیت: آنلاین';
+            } else {
+                statusPill.className = 'status-pill offline';
+                statusLabel.textContent = 'وضعیت: آفلاین';
+            }
+        }
+
+        window.addEventListener('online', async () => {
+            await updateNetworkStatus();
+            showNotification('اتصال اینترنت برقرار شد! در حال هدایت به داشبورد...', 'check-circle');
+            setTimeout(() => window.location.href = 'dash.php', 1200);
+        });
+
+        window.addEventListener('offline', () => {
+            updateNetworkStatus();
+            showNotification('ارتباط اینترنت قطع گردید', 'wifi-off');
+        });
+
+        updateNetworkStatus();
+
+        // دکمه بررسی و تلاش مجدد
+        const retryBtn = document.getElementById('retryConnectionBtn');
+        const retryBtnText = document.getElementById('retryBtnText');
+
+        retryBtn.addEventListener('click', async () => {
+            retryBtn.disabled = true;
+            retryBtnText.innerHTML = '<span class="spinner"></span> در حال بررسی اتصال...';
+
+            const connected = await testNetworkConnection();
+            if (connected) {
+                showNotification('ارتباط اینترنت متصل است! در حال بارگذاری...', 'check-circle');
+                setTimeout(() => window.location.href = 'dash.php', 1000);
+            } else {
+                showNotification('هنوز ارتباط اینترنتی برقرار نشده است.', 'wifi-off');
+                setTimeout(() => {
+                    retryBtn.disabled = false;
+                    retryBtnText.textContent = 'تلاش مجدد و بررسی اتصال';
+                    refreshIcons();
+                }, 1200);
+            }
+        });
+
+        // رندر آیکن‌ها پس از لود صفحه
+        document.addEventListener('DOMContentLoaded', refreshIcons);
+        setTimeout(refreshIcons, 300);
+    </script>
+</body>
+</html>

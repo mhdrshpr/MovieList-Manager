@@ -1,0 +1,17 @@
+# محیط
+.env
+.env.*
+!.env.example
+
+# لاگ ها
+*.log
+api/error_log
+stable/error_log
+
+# وابستگی ها
+node_modules/
+vendor/
+
+# سیستم عامل
+Thumbs.db
+.DS_Store
