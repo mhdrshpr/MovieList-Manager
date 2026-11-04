@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/PHP-8.0%2B-777BB4?style=flat-square&logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/MySQL-5.7%2B-4479A1?style=flat-square&logo=mysql&logoColor=white" alt="MySQL">
   <img src="https://img.shields.io/badge/Tauri-v2.0-24C8DB?style=flat-square&logo=tauri&logoColor=white" alt="Tauri">
+  <img src="https://img.shields.io/badge/Android-TWA%20APK-3DDC84?style=flat-square&logo=android&logoColor=white" alt="Android APK">
   <img src="https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
   <img src="https://img.shields.io/badge/Platform-Web%20%7C%20Windows%20%7C%20Mobile-0078D6?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
@@ -23,7 +24,7 @@
 
 **Movie List** یک پلتفرم جامع، پرسرعت و سبک بر پایه‌ی **PHP** و **JavaScript** است که با رابط کاربری اختصاصی راست‌چین (RTL) و طراحی واکنش‌گرا (ریسپانسیو)، امکان مدیریت شخصی فیلم‌ها، سریال‌ها و فصل‌های آن‌ها را فراهم می‌کند.
 
-این سامانه علاوه بر اجرا در مرورگر، قابلیت نصب به عنوان **وب‌اپلیکیشن پیشرونده (PWA)** روی گوشی‌های اندروید و iOS و همچنین اجرای نیتیو به صورت **نرم‌افزار دسکتاپ ویندوز (`.exe`)** با فریم‌ورک فوق‌سبک **Tauri v2** را داراست.
+این سامانه علاوه بر اجرا در مرورگر، قابلیت نصب به عنوان **وب‌اپلیکیشن پیشرونده (PWA)**، ساخت اپلیکیشن بومی اندروید (**فایل‌های `.apk` و `.aab`**) از طریق ابزار رسمی گوگل (**Google Bubblewrap / TWA**) و همچنین اجرای نیتیو به صورت **نرم‌افزار دسکتاپ ویندوز (`.exe`)** با فریم‌ورک فوق‌سبک **Tauri v2** را داراست.
 
 ---
 
@@ -72,11 +73,18 @@
 Movie List/
 ├── .github/
 │   └── workflows/
-│       └── build-exe.yml       # گردش‌کار خودکار گیت‌هاب برای کامپایل فایل exe با توری
+│       ├── build-exe.yml       # گردش‌کار خودکار گیت‌هاب برای کامپایل فایل exe با توری
+│       └── build-apk.yml       # گردش‌کار خودکار گیت‌هاب برای بیلد APK اندروید با Bubblewrap
 ├── api/
 │   ├── api.php                 # اندپوینت‌های اصلی سامانه (RESTful JSON API)
 │   ├── db_connect.php          # اتصال امن PDO، تعریف ۳۲ ژانر و مایگریشن خودکار
 │   └── env_loader.php          # لودر اختصاصی فایل تنظیمات .env
+├── apk file/
+│   ├── README.md               # راهنمای مستقل ساخت و امضای اپلیکیشن اندروید
+│   ├── build.bat               # اسکریپت بیلد و اجرای محلی در ویندوز
+│   ├── twa-manifest.json       # مانیفست اصلی پیکربندی TWA برای Bubblewrap
+│   ├── assetlinks.json         # الگوی احراز هویت دامنه در اندروید جهت حذف نوار URL
+│   └── icons/                  # آیکون‌های وکتور و رستر استاندارد اندروید
 ├── exe file/
 │   ├── README.md               # راهنمای مستقل ساخت نرم‌افزار دسکتاپ
 │   ├── build.bat               # اسکریپت بیلد ویندوزی با یک کلیک
@@ -175,6 +183,22 @@ chmod -R 755 uploads/
 1. ابزار [Rust](https://rustup.rs) را روی ویندوز نصب داشته باشید.
 2. وارد پوشه `exe file` شده و فایل `build.bat` را اجرا نمایید.
 3. فایل خروجی در مسیر `exe file/src-tauri/target/release/bundle/` تولید می‌شود.
+
+---
+
+## 📱 راهنمای دریافت فایل اندروید (`.apk`) با Google Bubblewrap
+
+### روش اول: بیلد خودکار در گیت‌هاب (پیشنهادی - بدون نیاز به نصب هیچ چیز)
+1. به تب **Actions** در ریپازیتوری گیت‌هاب بروید و ورک‌فلو **Build Android APK (Bubblewrap TWA)** را انتخاب کنید.
+2. روی دکمه **Run workflow** کلیک نمایید.
+3. پس از ۲ الی ۳ دقیقه، فایل نصبی امضاشده (`MovieList-Android-Release-APK`) در بخش **Artifacts** انتهای صفحه آماده دانلود مستقیم روی گوشی است.
+4. *(با ساخت هر تگ انتشار مانند `v1.0.0`، فایل‌های `.apk` و `.aab` به صورت خودکار به Release پیوست می‌شوند).*
+
+### روش دوم: کامپایل لوکال روی سیستم
+1. از نصب بودن Node.js و Java JDK 17 روی سیستم مطمئن شوید.
+2. وارد پوشه `apk file` شده و فایل `build.bat` را اجرا نمایید.
+3. فایل‌های خروجی `app-release-signed.apk` و `app-release-bundle.aab` در همان پوشه تولید می‌شوند.
+
 
 ---
 

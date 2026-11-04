@@ -1,0 +1,103 @@
+name: Build Android APK (Bubblewrap TWA)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apk file/**'
+      - '.github/workflows/build-apk.yml'
+    tags:
+      - 'v*'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Configure Bubblewrap CLI Environment
+        run: |
+          mkdir -p ~/.bubblewrap
+          cat <<EOF > ~/.bubblewrap/config.json
+          {
+            "jdkPath": "${JAVA_HOME}",
+            "androidSdkPath": "${ANDROID_HOME}"
+          }
+          EOF
+          npm install -g @bubblewrap/cli
+
+      - name: Setup Keystore (Custom or Auto-generated)
+        id: keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          cd "apk file"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "[INFO] Using user-provided keystore from GitHub Secrets..."
+            echo "$KEYSTORE_BASE64" | base64 --decode > android.keystore
+            echo "KEYSTORE_PASSWORD=${KEYSTORE_PASS}" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=${KEY_PASS}" >> $GITHUB_ENV
+          else
+            echo "[INFO] No keystore secret found. Generating self-signed keystore for build..."
+            keytool -genkeypair -v \
+              -keystore android.keystore \
+              -alias movielist \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass "android123" \
+              -keypass "android123" \
+              -dname "CN=MovieList, OU=MovieManager, O=MovieManager, L=Tehran, ST=Tehran, C=IR"
+            echo "KEYSTORE_PASSWORD=android123" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=android123" >> $GITHUB_ENV
+          fi
+
+      - name: Build Android App (APK & AAB)
+        working-directory: './apk file'
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+        run: |
+          bubblewrap build --skipVersionUpgrade
+
+      - name: Upload Artifacts (APK and AAB)
+        uses: actions/upload-artifact@v4
+        with:
+          name: MovieList-Android-Release-APK
+          path: |
+            ./apk file/*.apk
+            ./apk file/*.aab
+            ./apk file/app-release-signed.apk
+            ./apk file/app-release-bundle.aab
+          if-no-files-found: warn
+
+      - name: Release on Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./apk file/*.apk
+            ./apk file/*.aab
+          generate_release_notes: true

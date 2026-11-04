@@ -1,0 +1,65 @@
+{
+  "packageId": "ir.mhdr_shpr.movielist",
+  "host": "movielist.mhdr-shpr.ir",
+  "name": "MovieManager - مدیریت فیلم و سریال",
+  "launcherName": "MovieMgr",
+  "display": "standalone",
+  "themeColor": "#0891b2",
+  "themeColorDark": "#0b1120",
+  "navigationColor": "#0b1120",
+  "navigationColorDark": "#0b1120",
+  "navigationDividerColor": "#1e293b",
+  "navigationDividerColorDark": "#1e293b",
+  "backgroundColor": "#0b1120",
+  "enableNotifications": true,
+  "startUrl": "/dash.php",
+  "iconUrl": "https://movielist.mhdr-shpr.ir/static/icons/icon-512.png",
+  "maskableIconUrl": "https://movielist.mhdr-shpr.ir/static/icons/icon-512.png",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "movielist"
+  },
+  "splashScreenFadeOutDuration": 300,
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "shortcuts": [
+    {
+      "name": "داشبورد",
+      "shortName": "داشبورد",
+      "url": "https://movielist.mhdr-shpr.ir/dash.php",
+      "chosenIconUrl": "https://movielist.mhdr-shpr.ir/static/icons/icon-192.png"
+    },
+    {
+      "name": "همه عناوین",
+      "shortName": "عناوین",
+      "url": "https://movielist.mhdr-shpr.ir/all_titles.php",
+      "chosenIconUrl": "https://movielist.mhdr-shpr.ir/static/icons/icon-192.png"
+    },
+    {
+      "name": "پروفایل من",
+      "shortName": "پروفایل",
+      "url": "https://movielist.mhdr-shpr.ir/user.php",
+      "chosenIconUrl": "https://movielist.mhdr-shpr.ir/static/icons/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://movielist.mhdr-shpr.ir/manifest.json",
+  "fallbackType": "customtabs",
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": []
+}

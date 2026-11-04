@@ -35,7 +35,7 @@ php_value default_charset "UTF-8"
     Deny from all
 </FilesMatch>
 
-<FilesMatch "(composer\.json|composer\.lock|package\.json|package-lock\.json|webpack\.config\.js|vite\.config\.js|api/env_loader\.php|api/db_connect\.php)">
+<FilesMatch "(composer\.json|composer\.lock|package\.json|package-lock\.json|webpack\.config\.js|vite\.config\.js|api/env_loader\.php|api/db_connect\.php|twa-manifest\.json|Cargo\.toml)">
     Order allow,deny
     Deny from all
 </FilesMatch>
