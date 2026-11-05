@@ -59,7 +59,7 @@
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://movielist.mhdr-shpr.ir/manifest.json",
   "fallbackType": "customtabs",
-  "minSdkVersion": 21,
+  "minSdkVersion": 24,
   "orientation": "default",
   "fingerprints": []
 }
