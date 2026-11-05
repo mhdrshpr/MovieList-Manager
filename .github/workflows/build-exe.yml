@@ -34,6 +34,10 @@ jobs:
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0.0" --locked
 
+      - name: Ensure Desktop Icons
+        working-directory: './exe file/src-tauri'
+        run: cargo tauri icon ./icons/icon.png
+
       - name: Build Tauri Desktop EXE
         working-directory: './exe file/src-tauri'
         run: cargo tauri build

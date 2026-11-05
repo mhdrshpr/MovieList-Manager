@@ -23,6 +23,7 @@ if %errorlevel% neq 0 (
 
 echo [اطلاع] در حال شروع فرآیند کامپایل و بیلد فایل exe...
 cd src-tauri
+cargo tauri icon icons\icon.png
 cargo tauri build
 
 if %errorlevel% equ 0 (

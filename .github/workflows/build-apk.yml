@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Setup Java (JDK 17)
         uses: actions/setup-java@v4
@@ -32,11 +32,18 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Configure Bubblewrap CLI Environment
+      - name: Configure Android SDK & Bubblewrap CLI
         run: |
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=${ANDROID_HOME}" >> $GITHUB_ENV
+          
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          SDKMANAGER=$(find ${ANDROID_HOME}/cmdline-tools -name sdkmanager -type f 2>/dev/null | head -n 1)
+          if [ -n "$SDKMANAGER" ]; then
+            yes | "$SDKMANAGER" --licenses || true
+          fi
+
           mkdir -p ~/.bubblewrap
           cat <<EOF > ~/.bubblewrap/config.json
           {
@@ -44,6 +51,7 @@ jobs:
             "androidSdkPath": "${ANDROID_HOME}"
           }
           EOF
+          
           npm install -g @bubblewrap/cli
 
       - name: Setup Keystore (Custom or Auto-generated)
@@ -80,7 +88,8 @@ jobs:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
         run: |
-          bubblewrap build --skipVersionUpgrade
+          bubblewrap update --skipVersionUpgrade || true
+          printf "%s\n%s\n" "${{ env.KEYSTORE_PASSWORD }}" "${{ env.KEY_PASSWORD }}" | bubblewrap build --skipVersionUpgrade
 
       - name: Upload Artifacts (APK and AAB)
         uses: actions/upload-artifact@v4
